@@ -174,4 +174,4 @@ cython_debug/
 .pypirc
 
 # VSCode settings
-.vscode/settings.json
+.vscode/*.json
