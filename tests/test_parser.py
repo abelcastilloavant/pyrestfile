@@ -44,10 +44,17 @@ class TestRestParser(unittest.TestCase):
             "POST https://api.example.com/submit HTTP/1.1\n"
             "Content-Type: text/plain\n"
             "\n"
-            '{"message": "Hello, world!"}\n'
+            'Hello world!\n'
         )
-        with self.assertRaises(ValueError):
-            parse_rest_file(sample_text)
+        requests_parsed = parse_rest_file(sample_text)
+        print(requests_parsed)
+        self.assertEqual(len(requests_parsed), 1)
+        req: HTTPRequest = requests_parsed[0]
+        self.assertEqual(req.method, "POST")
+        self.assertEqual(req.url, "https://api.example.com/submit")
+        self.assertEqual(req.http_version, "HTTP/1.1")
+        self.assertEqual(req.headers.get("Content-Type"), "text/plain")
+        self.assertEqual(req.body, 'Hello world!')
     
     def test_invalid_json_body(self):
         sample_text = (
