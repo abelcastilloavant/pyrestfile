@@ -27,9 +27,13 @@ jobs:
         pip install .
         pip install pre-commit 
 
+    - name: Install pre-commit hooks
+      run: |
+        pre-commit install
+
     - name: Run pre-commit hooks
       run: |
-        pre-commit run --all-files  # Run all hooks on all files
+        pre-commit run --all-files
 
     - name: Run unit tests with unittest
       run: |
