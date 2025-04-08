@@ -2,6 +2,7 @@ import unittest
 import json
 from pyrestfileparser.parser import parse_rest_file, HTTPRequest
 
+
 class TestRestParser(unittest.TestCase):
     def test_valid_requests(self):
         sample_text = (
@@ -19,7 +20,6 @@ class TestRestParser(unittest.TestCase):
         requests_parsed = parse_rest_file(sample_text)
 
         self.assertEqual(len(requests_parsed), 2)
-        
 
         req1: HTTPRequest = requests_parsed[0]
         self.assertEqual(req1.method, "GET")
@@ -29,7 +29,6 @@ class TestRestParser(unittest.TestCase):
         self.assertEqual(req1.headers.get("Authorization"), "Bearer abc123")
         body1 = json.loads(req1.body)
         self.assertEqual(body1, {"key": "value"})
-        
 
         req2: HTTPRequest = requests_parsed[1]
         self.assertEqual(req2.method, "POST")
@@ -38,14 +37,9 @@ class TestRestParser(unittest.TestCase):
         self.assertEqual(req2.headers.get("Content-Type"), "application/json")
         body2 = json.loads(req2.body)
         self.assertEqual(body2, {"message": "Hello, world!"})
-    
+
     def test_invalid_content_type(self):
-        sample_text = (
-            "POST https://api.example.com/submit HTTP/1.1\n"
-            "Content-Type: text/plain\n"
-            "\n"
-            'Hello world!\n'
-        )
+        sample_text = "POST https://api.example.com/submit HTTP/1.1\nContent-Type: text/plain\n\nHello world!\n"
         requests_parsed = parse_rest_file(sample_text)
         print(requests_parsed)
         self.assertEqual(len(requests_parsed), 1)
@@ -54,8 +48,8 @@ class TestRestParser(unittest.TestCase):
         self.assertEqual(req.url, "https://api.example.com/submit")
         self.assertEqual(req.http_version, "HTTP/1.1")
         self.assertEqual(req.headers.get("Content-Type"), "text/plain")
-        self.assertEqual(req.body, 'Hello world!')
-    
+        self.assertEqual(req.body, "Hello world!")
+
     def test_invalid_json_body(self):
         sample_text = (
             "POST https://api.example.com/submit HTTP/1.1\n"
@@ -66,5 +60,6 @@ class TestRestParser(unittest.TestCase):
         with self.assertRaises(ValueError):
             parse_rest_file(sample_text)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
