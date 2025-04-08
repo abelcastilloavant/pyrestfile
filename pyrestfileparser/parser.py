@@ -19,10 +19,9 @@ def process_block(block) -> HTTPRequest:
     Checks that if a body is present, the Content-Type header includes 'application/json'
     and that the body is valid JSON.
     """
-    req_line = block["request_line"]
-    method_val = req_line.get("method", "GET")
-    url_val = req_line["url"]
-    http_ver = req_line.get("http_version", "")
+    method_val = block.get("method", "GET")
+    url_val = block["url"]
+    http_ver = block.get("http_version", "")
     
     # Build headers dictionary.
     headers_dict = {}
