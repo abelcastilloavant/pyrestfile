@@ -20,12 +20,16 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.12
-    
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install .
-        pip install pre-commit 
+        pip install pre-commit
+
+    - name: Clear pre-commit cache
+      run: |
+        pre-commit clean
 
     - name: Install pre-commit hooks
       run: |
@@ -37,4 +41,4 @@ jobs:
 
     - name: Run unit tests with unittest
       run: |
-        unittest discover -s tests -p "test_*.py" 
+        unittest discover -s tests -p "test_*.py"
