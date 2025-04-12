@@ -15,5 +15,11 @@ dependencies = [
 name = "Abel Castillo"
 email = "abelcastillomath@gmail.com"
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pre-commit"       # keep in sync with your CI workflow
+]
+
 [tool.ruff]
 line-length = 120

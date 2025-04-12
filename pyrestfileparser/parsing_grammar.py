@@ -26,6 +26,9 @@ CRLF = LineEnd().suppress()
 # Define a delimiter: a line starting with at least three '#' characters.
 DELIMITER = LineStart() + Regex(r"#{3,}") + LineEnd().suppress()
 
+# Comments in .rest files are lines starting with '#' or '//'.
+COMMENT_LINE = Suppress(LineStart() + Regex(r"\s*(#|//).*") + LineEnd())
+
 
 def request_line_definition():
     """Defines the request line: an optional method, a URL, and an optional HTTP version."""
@@ -34,12 +37,12 @@ def request_line_definition():
     http_version = Combine(Literal("HTTP/") + Word("0123456789.")).setResultsName("http_version")
     return Optional(method + White()) + url + Optional(White() + http_version)
 
-
 def headers_definition():
     """Defines headers as zero or more header lines."""
     header_name = Word(alphanums + "-")
     header = Group(header_name("name") + Suppress(":") + restOfLine("value") + CRLF)
-    return PPDict(ZeroOrMore(header))
+    header_or_comment = header | COMMENT_LINE
+    return PPDict(ZeroOrMore(header_or_comment))
 
 
 def body_definition():
@@ -54,10 +57,10 @@ def request_block_definition():
     hdrs = headers_definition()
     bdy = body_definition()
     return Group(
-        req_line("request_line")
+        ZeroOrMore(COMMENT_LINE | CRLF)
+        + req_line("request_line")
         + CRLF
-        + Optional(hdrs("headers"))
-        + Optional(CRLF)
+        + Optional(hdrs("headers") + CRLF) 
         + Optional(bdy)
         + Optional(DELIMITER)  # Consume the delimiter if present.
     )("request")
