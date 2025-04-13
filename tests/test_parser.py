@@ -159,8 +159,8 @@ def test_comment_styles_hash_and_slash():
     assert r.method == "PATCH"
     assert r.headers["X-Foo"] == "bar"
 
+
 def test_mixed_case_methods_are_normalised():
     sample = "patch https://api.example.com/foo\n\n"
     req = parse_rest_file(sample)[0]
     assert req.method == "PATCH"
-    
