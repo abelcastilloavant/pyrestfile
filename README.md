@@ -50,7 +50,7 @@ for req in requests:
 | `url`          | `str`            | `"https://api.example.com/v1/users"`   |               |
 | `http_version` | `str`            | `"HTTP/1.1"` (optional)                |               |
 | `headers`      | `dict[str, str]` | `{"Content-Type": "application/json"}` |               |
-| `body`         | \`str | None\`   |                                        | raw body text |
+| `body`         | `str` or None    | `"raw body text"`                      |               |
 
 ---
 
