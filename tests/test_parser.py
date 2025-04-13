@@ -18,13 +18,16 @@ from pyrestfileparser.parser import parse_rest_file, HTTPRequest
 # Helpers
 # ──────────────────────────────────────────────────────────────────────────────
 
+
 def _dedent(s: str) -> str:
     """Remove leading indentation and margin pipes used in multi‑line strings."""
     return textwrap.dedent(s).replace("│", "").lstrip("\n")
 
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Happy‑path parsing
 # ──────────────────────────────────────────────────────────────────────────────
+
 
 def test_parse_two_valid_requests():
     sample = _dedent(
@@ -60,9 +63,11 @@ def test_parse_two_valid_requests():
     assert r1.headers["Content-Type"] == "application/json"
     assert json.loads(r1.body) == {"message": "Hello, world!"}
 
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Non‑JSON body with non‑JSON content type
 # ──────────────────────────────────────────────────────────────────────────────
+
 
 def test_plain_text_body_is_accepted():
     sample = _dedent(
@@ -81,9 +86,11 @@ def test_plain_text_body_is_accepted():
     assert r.headers["Content-Type"] == "text/plain"
     assert r.body == "Hello world!"
 
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Invalid JSON body should raise
 # ──────────────────────────────────────────────────────────────────────────────
+
 
 def test_invalid_json_raises_value_error():
     sample = _dedent(
@@ -97,6 +104,7 @@ def test_invalid_json_raises_value_error():
 
     with pytest.raises(ValueError):
         parse_rest_file(sample)
+
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Comment handling tests
@@ -132,6 +140,7 @@ def test_comment_lines_are_ignored():
     assert r1.method == "GET"
     assert "inside body" in r0.body
 
+
 def test_comment_styles_hash_and_slash():
     sample = _dedent(
         """
@@ -149,5 +158,3 @@ def test_comment_styles_hash_and_slash():
     r = reqs[0]
     assert r.method == "PATCH"
     assert r.headers["X-Foo"] == "bar"
-
-

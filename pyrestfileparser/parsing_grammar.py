@@ -35,6 +35,7 @@ def request_line_definition():
     http_version = Combine(Literal("HTTP/") + Word("0123456789.")).setResultsName("http_version")
     return Optional(method + White()) + url + Optional(White() + http_version)
 
+
 def headers_definition():
     """Defines headers as zero or more header lines."""
     header_name = Word(alphanums + "-")
@@ -66,7 +67,6 @@ def request_block_definition():
         # it will cause parsing issues for the next block.
         + Optional(DELIMITER)
     )("request")
-
 
 
 REST_PARSER = OneOrMore(request_block_definition()) + StringEnd()
