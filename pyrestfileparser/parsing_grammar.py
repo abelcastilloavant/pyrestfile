@@ -30,7 +30,7 @@ COMMENT_LINE = Suppress(LineStart() + Regex(COMMENT_LINE_PATTERN) + LineEnd())
 
 def request_line_definition():
     """Defines the request line: an optional method, a URL, and an optional HTTP version."""
-    method = Word(alphas.upper(), min=1)("method")
+    method = Word(alphas, min=1).setResultsName("method").setParseAction(lambda t: t[0].upper())
     url = Regex(NON_WHITESPACE_CHARS_PATTERN).setResultsName("url")
     http_version = Combine(Literal("HTTP/") + Word("0123456789.")).setResultsName("http_version")
     return Optional(method + White()) + url + Optional(White() + http_version)
