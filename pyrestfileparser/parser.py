@@ -1,4 +1,3 @@
-# rest_parser.py
 import json
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional

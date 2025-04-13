@@ -9,7 +9,6 @@ These tests cover:
 
 import json
 import textwrap
-import random
 
 import pytest
 
