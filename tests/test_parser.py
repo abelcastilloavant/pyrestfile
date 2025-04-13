@@ -164,3 +164,18 @@ def test_mixed_case_methods_are_normalised():
     sample = "patch https://api.example.com/foo\n\n"
     req = parse_rest_file(sample)[0]
     assert req.method == "PATCH"
+
+
+def test_rendered_headers_and_url():
+    text = """
+    @token = abc123
+    GET https://{{host}}/v1/foo
+    Authorization: Bearer {{token}}
+
+    ###
+
+    """
+    parsed = parse_rest_file(text, env={"host": "api.example.com"})
+    req = parsed[0]
+    assert req.url == "https://api.example.com/v1/foo"
+    assert req.headers["Authorization"] == "Bearer abc123"
