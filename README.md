@@ -44,13 +44,13 @@ for req in requests:
 
 `HTTPRequest` instances expose:
 
-| attribute      | type             | example                                |               |
-| -------------- | ---------------- | -------------------------------------- | ------------- |
-| `method`       | `str`            | `"POST"`                               |               |
-| `url`          | `str`            | `"https://api.example.com/v1/users"`   |               |
-| `http_version` | `str`            | `"HTTP/1.1"` (optional)                |               |
-| `headers`      | `dict[str, str]` | `{"Content-Type": "application/json"}` |               |
-| `body`         | `str` or None    | `"raw body text"`                      |               |
+| attribute      | type             | example                                |
+| -------------- | ---------------- | -------------------------------------- |
+| `method`       | `str`            | `"POST"`                               |
+| `url`          | `str`            | `"https://api.example.com/v1/users"`   |
+| `http_version` | `str`            | `"HTTP/1.1"` (optional)                |
+| `headers`      | `dict[str, str]` | `{"Content-Type": "application/json"}` |
+| `body`         | `str` or None    | `"raw body text"`                      |
 
 ---
 

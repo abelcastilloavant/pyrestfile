@@ -23,12 +23,8 @@ DELIMITER_LINE_PATTERN = r"#{3,}"
 COMMENT_LINE_PATTERN = r"\s*(#|//).*"
 NON_WHITESPACE_CHARS_PATTERN = r"\S+"
 
-# Suppress newline (CRLF)
-CRLF = LineEnd().suppress()
-
-DELIMITER = LineStart() + Regex(DELIMITER_LINE_PATTERN) + LineEnd().suppress()
-
-# Comments in .rest files are lines starting with '#' or '//'.
+SUPRESSED_NEWLINE = LineEnd().suppress()
+DELIMITER = LineStart() + Regex(DELIMITER_LINE_PATTERN) + SUPRESSED_NEWLINE
 COMMENT_LINE = Suppress(LineStart() + Regex(COMMENT_LINE_PATTERN) + LineEnd())
 
 
@@ -42,7 +38,7 @@ def request_line_definition():
 def headers_definition():
     """Defines headers as zero or more header lines."""
     header_name = Word(alphanums + "-")
-    header = Group(header_name("name") + Suppress(":") + restOfLine("value") + CRLF)
+    header = Group(header_name("name") + Suppress(":") + restOfLine("value") + SUPRESSED_NEWLINE)
     header_or_comment = header | COMMENT_LINE
     return PPDict(ZeroOrMore(header_or_comment))
 
@@ -61,10 +57,10 @@ def request_block_definition():
     hdrs = headers_definition()
     bdy = body_definition()
     return Group(
-        ZeroOrMore(COMMENT_LINE | CRLF)
+        ZeroOrMore(COMMENT_LINE | SUPRESSED_NEWLINE)
         + req_line("request_line")
-        + CRLF
-        + Optional(hdrs("headers") + CRLF)
+        + SUPRESSED_NEWLINE
+        + Optional(hdrs("headers") + SUPRESSED_NEWLINE)
         + Optional(bdy)
         # If we don't consume the delimiter after the body,
         # it will cause parsing issues for the next block.
