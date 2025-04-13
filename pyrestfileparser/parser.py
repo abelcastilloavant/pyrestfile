@@ -29,9 +29,11 @@ def process_block(block, renderer: Renderer) -> HTTPRequest:
 
     headers = {}
     if "headers" in block:
-        for _, result in block["headers"].items():
-            key = result.get("name", "").strip()
-            value = result.get("value", "").strip()
+        for key, result in block["headers"].items():
+            if isinstance(result, str):
+                value = result.strip()
+            else:
+                value = result.get("value", "").strip()
             if key and value:
                 headers[key] = renderer.render(value)
 

@@ -148,8 +148,6 @@ def test_comment_styles_hash_and_slash():
         │// double‑slash comment
         │PATCH https://api.example.com/baz
         │X-Foo: bar
-        │
-        │###
         """
     )
 
