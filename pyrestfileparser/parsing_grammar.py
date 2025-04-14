@@ -1,4 +1,5 @@
 from pyparsing import (
+    FollowedBy,
     Word,
     alphas,
     alphanums,
@@ -20,7 +21,7 @@ from pyparsing import (
 )
 
 DELIMITER_LINE_PATTERN = r"#{3,}"
-COMMENT_LINE_PATTERN = r"\s*(#|//).*"
+COMMENT_LINE_PATTERN = r"(?:\s*#.*|\s*//.*)"
 NON_WHITESPACE_CHARS_PATTERN = r"\S+"
 
 SUPRESSED_NEWLINE = LineEnd().suppress()
@@ -39,7 +40,13 @@ def request_line_definition():
 def headers_definition():
     """Defines headers as zero or more header lines."""
     header_name = Word(alphanums + "-")
-    header = Group(LineStart() + header_name("name") + Suppress(":") + restOfLine("value") + (LineEnd() | StringEnd()))
+    header = Group(
+        FollowedBy(Word(alphanums + "-") + ":")  # ← guarantees colon present
+        + header_name("name")
+        + Suppress(":")
+        + restOfLine("value")
+        + LineEnd()
+    )
     header_or_comment = header | COMMENT_LINE
     return PPDict(ZeroOrMore(header_or_comment))
 
