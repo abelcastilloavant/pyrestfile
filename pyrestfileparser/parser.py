@@ -23,7 +23,7 @@ def process_block(block, renderer: Renderer) -> HTTPRequest:
     Checks that if a body is present, the Content-Type header includes 'application/json'
     and that the body is valid JSON.
     """
-    method = block.get("method", "GET")
+    method = block.get("method", "GET").upper()
     url = renderer.render(block["url"])
     http_version = block.get("http_version", "")
 
