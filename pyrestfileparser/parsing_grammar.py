@@ -14,18 +14,22 @@ from pyparsing import (
     Dict as PPDict,
     Regex,
     StringEnd,
-    Suppress,
     SkipTo,
     LineStart,
     ZeroOrMore,
 )
 
 DELIMITER_LINE_PATTERN = r"#{3,}"
-COMMENT_LINE_PATTERN = r"(?:\s*#.*|\s*//.*)"
+COMMENT_LINE = (
+    LineStart() +
+    Optional(White(" \t")) +
+    (Literal("#") | Literal("//")) +
+    restOfLine +
+    LineEnd()
+)
 NON_WHITESPACE_CHARS_PATTERN = r"\S+"
 
 DELIMITER = LineStart() + Regex(DELIMITER_LINE_PATTERN) + LineEnd()
-COMMENT_LINE = LineStart() + Regex(COMMENT_LINE_PATTERN) + LineEnd()
 EMPTY_LINE = Group(LineStart() + Optional(White(" \t")) + LineEnd())
 
 def request_line_definition():

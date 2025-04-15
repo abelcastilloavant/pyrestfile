@@ -137,11 +137,12 @@ def test_comment_lines_are_ignored():
 
     r0, r1 = reqs
     assert r0.method == "PATCH"
-    assert r1.method == "GET"
+    assert r0.headers["Content-Type"] == "text/plain"
     assert "comment after body" in r0.body
     assert "comment between headers and body" not in r0.body
     assert "inside body" in r0.body
 
+    assert r1.method == "GET"
 
 def test_comment_styles_hash_and_slash():
     sample = _dedent(
