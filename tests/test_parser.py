@@ -106,7 +106,6 @@ def test_invalid_json_raises_value_error():
         parse_rest_file(sample)
 
 
-
 def test_comment_styles_hash_and_slash():
     sample = _dedent(
         """
