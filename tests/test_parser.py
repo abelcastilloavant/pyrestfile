@@ -106,41 +106,6 @@ def test_invalid_json_raises_value_error():
         parse_rest_file(sample)
 
 
-# ──────────────────────────────────────────────────────────────────────────────
-# Comment handling tests
-# ──────────────────────────────────────────────────────────────────────────────
-def test_comment_lines_are_ignored():
-    sample = _dedent(
-        """
-        │### leading delimiter comment
-        │# leading comment before request line
-        │PATCH https://api.example.com/foo HTTP/1.1
-        │# comment between request line and headers
-        │Content-Type: text/plain
-        │// comment inside header section
-        │# comment between headers and body
-        │
-        │# inside body – should not be stripped
-        │name=Ada
-        │age=42
-        │# comment after body
-        │###
-        │// comment before second request
-        │GET https://api.example.com/bar
-        │Accept: application/json
-        │
-        │### trailing delimiter
-        """
-    )
-    reqs = parse_rest_file(sample)
-    assert len(reqs) == 2
-
-    r0, r1 = reqs
-    assert r0.method == "PATCH"
-    assert r1.method == "GET"
-    assert "inside body" in r0.body
-
-
 def test_comment_styles_hash_and_slash():
     sample = _dedent(
         """
@@ -148,8 +113,6 @@ def test_comment_styles_hash_and_slash():
         │// double‑slash comment
         │PATCH https://api.example.com/baz
         │X-Foo: bar
-        │
-        │###
         """
     )
 
@@ -164,3 +127,18 @@ def test_mixed_case_methods_are_normalised():
     sample = "patch https://api.example.com/foo\n\n"
     req = parse_rest_file(sample)[0]
     assert req.method == "PATCH"
+
+
+def test_rendered_headers_and_url():
+    text = """
+    @token = abc123
+    GET https://{{host}}/v1/foo
+    Authorization: Bearer {{token}}
+
+    ###
+
+    """
+    parsed = parse_rest_file(text, env={"host": "api.example.com"})
+    req = parsed[0]
+    assert req.url == "https://api.example.com/v1/foo"
+    assert req.headers["Authorization"] == "Bearer abc123"

@@ -2,6 +2,7 @@ import json
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 from pyrestfileparser.parsing_grammar import REST_PARSER
+from pyrestfileparser.vars import collect_var_values, Renderer, strip_var_declarations
 
 
 @dataclass
@@ -16,22 +17,29 @@ class HTTPRequest:
     body: Optional[str] = None
 
 
-def process_block(block) -> HTTPRequest:
+def process_block(block, renderer: Renderer) -> HTTPRequest:
     """
     Convert a parsed request block into an HTTPRequest instance.
     Checks that if a body is present, the Content-Type header includes 'application/json'
     and that the body is valid JSON.
     """
-    method = block.get("method", "GET")
-    url = block["url"]
+    method = block.get("method", "GET").upper()
+    url = renderer.render(block["url"])
     http_version = block.get("http_version", "")
 
     headers = {}
     if "headers" in block:
-        for key, value in block["headers"].items():
-            headers[key] = value.strip()
+        for key, result in block["headers"].items():
+            if isinstance(result, str):
+                value = result.strip()
+            else:
+                value = result.get("value", "").strip()
+            if key and value:
+                headers[key] = renderer.render(value)
 
     body = block.get("body", "").strip()
+    if body:
+        body = renderer.render(body)
     content_type = headers.get("Content-Type", "")
 
     if body and "application/json" in content_type.lower():
@@ -45,9 +53,14 @@ def process_block(block) -> HTTPRequest:
     )
 
 
-def parse_rest_file(text: str) -> List[HTTPRequest]:
+def parse_rest_file(text: str, env: dict[str, str] = {}) -> List[HTTPRequest]:
     """
     Parse the input .rest file text and return a list of HTTPRequest objects.
     """
-    parsed = REST_PARSER.parseString(text, parseAll=True)
-    return [process_block(block) for block in parsed]
+    inline_vars = collect_var_values(text)
+    merged_vars = {**(env or {}), **inline_vars}
+    renderer = Renderer(merged_vars)
+
+    cleaned_text = strip_var_declarations(text)
+    parsed = REST_PARSER.parseString(cleaned_text, parseAll=True)
+    return [process_block(block, renderer) for block in parsed]
