@@ -2,6 +2,9 @@ import re
 import time
 import uuid
 
+from pyrestfile.request_block_grammar import HTTPRequest
+
+
 OPTIONAL_WHITESPACE = r"\s*"
 LINE_START = r"^" + OPTIONAL_WHITESPACE
 VAR_NAME_GROUP = r"@(\w+)"
@@ -47,7 +50,20 @@ class Renderer:
     def __init__(self, variables: dict[str, str]):
         self.variables = variables
 
-    def render(self, template: str) -> str:
+    def render(self, request: HTTPRequest) -> HTTPRequest:
+        """Render the HTTPRequest object by replacing variables and builtins in its attributes."""
+        if request.method:
+            request.method = self._render_string(request.method)
+        if request.url:
+            request.url = self._render_string(request.url)
+        if request.body:
+            request.body = self._render_string(request.body)
+        if request.headers:
+            for key, value in request.headers.items():
+                request.headers[key] = self._render_string(value)
+        return request
+
+    def _render_string(self, template: str) -> str:
         return VAR_REFERENCE_PATTERN.sub(self._substitute, template)
 
     def _substitute(self, match):

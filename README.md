@@ -1,4 +1,4 @@
-# pyrestfileparser
+# pyrestfile
 
 *Parse VS Code REST‑Client **`.rest`** files into plain Python objects you can feed to any HTTP client — perfect for load‑testing, fixtures, and scripting.*
 
@@ -6,7 +6,7 @@
 
 ## Why?
 
-The VS Code REST‑Client extension is fantastic for ad‑hoc API calls, but its request files aren’t machine‑readable out of the box. **pyrestfileparser** lets you keep those same files in your repository and programmatically use them or validate them within Python.
+The VS Code REST‑Client extension is fantastic for ad‑hoc API calls, but its request files aren’t machine‑readable out of the box. **pyrestfile** lets you keep those same files in your repository and programmatically use them or validate them within Python.
 
 ## Features
 
@@ -14,7 +14,7 @@ The VS Code REST‑Client extension is fantastic for ad‑hoc API calls, but i
 - ✅  Preserve method, URL, headers, and body exactly as written.
 - ✅  Ignore full‑line comments (`#` or `//`) in the same places VS Code does.
 - ✅  Validate JSON bodies when `Content‑Type: application/json` is set.
-- ✅  Zero runtime dependencies beyond **pyparsing**.
+- ✅  Zero runtime dependencies.
 
 ---
 
@@ -22,7 +22,7 @@ The VS Code REST‑Client extension is fantastic for ad‑hoc API calls, but i
 
 ```bash
 # library only
-pip install pyrestfileparser
+pip install pyrestfile
 
 # with dev / test tooling (pytest, coverage, pre‑commit)
 pip install ".[dev]"
@@ -33,7 +33,7 @@ pip install ".[dev]"
 ## Quick‑start
 
 ```python
-from pyrestfileparser import parse_rest_file
+from pyrestfile import parse_rest_file
 
 with open("api.rest") as f:
     requests = parse_rest_file(f.read())
@@ -60,7 +60,7 @@ for req in requests:
 # locustfile.py
 import random
 from locust import HttpUser, task, between
-from pyrestfileparser import parse_rest_file
+from pyrestfile import parse_rest_file
 
 REQUESTS = parse_rest_file(open("api.rest").read())
 
@@ -99,7 +99,6 @@ A ready‑made GitHub Actions workflow (`.github/workflows/unit_tests_and_code_c
 
 ## Roadmap
 
-- Variable substitution (`@token = …`, `{{token}}`).
 - File includes (`@file=./payload.json`).
 - JavaScript test scripts (low priority).
 - CLI (`pyrest run api.rest`).

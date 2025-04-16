@@ -1,18 +1,10 @@
-"""pytest tests for pyrestfileparser
-These tests cover:
-1. Basic parsing of two well‑formed requests.
-2. Handling of non‑JSON bodies with non‑JSON content‑type.
-3. Raising a ValueError when the body is invalid JSON but the header claims application/json.
-4. Correct stripping of full‑line comments in every legal position.
-5. Acceptance of both # and // comment styles.
-"""
+# tests/test_parser.py
 
 import json
 import textwrap
-
 import pytest
 
-from pyrestfileparser.parser import parse_rest_file, HTTPRequest
+from pyrestfile import parse_rest_file, HTTPRequest
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Helpers
@@ -30,8 +22,7 @@ def _dedent(s: str) -> str:
 
 
 def test_parse_two_valid_requests():
-    sample = _dedent(
-        """
+    sample = _dedent("""
         │GET https://api.example.com HTTP/1.1
         │Content-Type: application/json
         │Authorization: Bearer abc123
@@ -42,9 +33,7 @@ def test_parse_two_valid_requests():
         │Content-Type: application/json
         │
         │{"message": "Hello, world!"}
-        """
-    )
-
+    """)
     reqs = parse_rest_file(sample)
     assert len(reqs) == 2
 
@@ -52,7 +41,7 @@ def test_parse_two_valid_requests():
     assert r0.method == "GET"
     assert r0.url == "https://api.example.com"
     assert r0.http_version == "HTTP/1.1"
-    assert r0.headers["Content-Type"] == "application/json"
+    assert r0.content_type == "application/json"
     assert r0.headers["Authorization"] == "Bearer abc123"
     assert json.loads(r0.body) == {"key": "value"}
 
@@ -60,85 +49,76 @@ def test_parse_two_valid_requests():
     assert r1.method == "POST"
     assert r1.url == "https://api.example.com/submit"
     assert r1.http_version == "HTTP/1.1"
-    assert r1.headers["Content-Type"] == "application/json"
+    assert r1.content_type == "application/json"
     assert json.loads(r1.body) == {"message": "Hello, world!"}
 
 
-# ──────────────────────────────────────────────────────────────────────────────
-# Non‑JSON body with non‑JSON content type
-# ──────────────────────────────────────────────────────────────────────────────
-
-
 def test_plain_text_body_is_accepted():
-    sample = _dedent(
-        """
+    sample = _dedent("""
         │POST https://api.example.com/submit HTTP/1.1
         │Content-Type: text/plain
         │
         │Hello world!
-        """
-    )
-
+    """)
     reqs = parse_rest_file(sample)
     assert len(reqs) == 1
     r: HTTPRequest = reqs[0]
     assert r.method == "POST"
-    assert r.headers["Content-Type"] == "text/plain"
+    assert r.content_type == "text/plain"
     assert r.body == "Hello world!"
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Invalid JSON body should raise
+# Error Handling
 # ──────────────────────────────────────────────────────────────────────────────
 
 
 def test_invalid_json_raises_value_error():
-    sample = _dedent(
-        """
+    sample = _dedent("""
         │POST https://api.example.com/submit HTTP/1.1
         │Content-Type: application/json
         │
         │{"message": "Hello, world!"  # missing closing brace
-        """
-    )
-
+    """)
     with pytest.raises(ValueError):
         parse_rest_file(sample)
 
 
-def test_comment_styles_hash_and_slash():
-    sample = _dedent(
-        """
-        │# hash comment
-        │// double‑slash comment
-        │PATCH https://api.example.com/baz
-        │X-Foo: bar
-        """
-    )
+# ──────────────────────────────────────────────────────────────────────────────
+# Comment Filtering & Method Normalization
+# ──────────────────────────────────────────────────────────────────────────────
 
+
+def test_comment_styles_and_mixed_case_methods():
+    sample = _dedent("""
+        │# initial comment
+        │// another comment
+        │patch https://api.example.com/baz http/1.1
+        │X-Foo: bar
+    """)
     reqs = parse_rest_file(sample)
     assert len(reqs) == 1
     r = reqs[0]
+    # method is normalized to uppercase
     assert r.method == "PATCH"
+    # comment lines are ignored before the request line
     assert r.headers["X-Foo"] == "bar"
 
 
-def test_mixed_case_methods_are_normalised():
-    sample = "patch https://api.example.com/foo\n\n"
-    req = parse_rest_file(sample)[0]
-    assert req.method == "PATCH"
+# ──────────────────────────────────────────────────────────────────────────────
+# Variable Rendering
+# ──────────────────────────────────────────────────────────────────────────────
 
 
 def test_rendered_headers_and_url():
-    text = """
-    @token = abc123
-    GET https://{{host}}/v1/foo
-    Authorization: Bearer {{token}}
-
-    ###
-
-    """
-    parsed = parse_rest_file(text, env={"host": "api.example.com"})
+    sample = _dedent("""
+        │@token = abc123
+        │GET https://{{host}}/v1/foo HTTP/1.1
+        │Authorization: Bearer {{token}}
+        │
+        │
+    """)
+    parsed = parse_rest_file(sample, env={"host": "api.example.com"})
     req = parsed[0]
     assert req.url == "https://api.example.com/v1/foo"
     assert req.headers["Authorization"] == "Bearer abc123"
