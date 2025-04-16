@@ -2,10 +2,10 @@ import json
 import re
 from dataclasses import dataclass, field
 from typing import Dict, Optional
-from pyrestfileparser.top_level_grammar import RequestBlock
+from pyrestfile.top_level_grammar import RequestBlock
 
 
-REQUEST_LINE_REGEX = r'^(?P<method>[A-Z]+)\s+(?P<url>\S+)(?:\s+(?P<version>HTTP/\S+))?'
+REQUEST_LINE_REGEX = r'^(?P<method>[a-zA-Z]+)\s+(?P<url>\S+)(?:\s+(?P<version>HTTP/\S+))?'
 REQUEST_LINE_PATTERN = re.compile(REQUEST_LINE_REGEX)
 
 @dataclass

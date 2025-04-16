@@ -1,5 +1,5 @@
+from pyrestfile.top_level_grammar import parse_rest_file_text
 
-from pyrestfileparser.top_level_grammar import parse_rest_file_text
 
 def test_empty_text():
     text = ""
@@ -18,7 +18,7 @@ Content-Type: text/plain
 
     assert block.request_line == "POST http://example.com/api"
     assert block.headers == "Content-Length: 123\nContent-Type: text/plain"
-    assert block.body is None
+    assert block.body == ""
 
 
 def test_single_block_with_delimiter_and_body():
@@ -75,8 +75,8 @@ DELETE http://example.com/resource/123 HTTP/1.1
 
     block3 = result[2]
     assert block3.request_line == "DELETE http://example.com/resource/123 HTTP/1.1"
-    assert block3.headers is None
-    assert block3.body is None
+    assert block3.headers == ""
+    assert block3.body == ""
 
 
 def test_block_no_headers_but_with_body():
@@ -93,7 +93,7 @@ Second line of body.
     assert len(result) == 1
     block = result[0]
     assert block.request_line == "GET http://example.com"
-    assert block.headers is None
+    assert block.headers == ""
     assert block.body == "Body starts here.\nSecond line of body."
 
 
@@ -107,7 +107,7 @@ Content-Type: application/json
     result = parse_rest_file_text(sample_text)
     assert len(result) == 1, "Expected a single request block"
     block = result[0]
-    
+
     assert block.description == "My REST request description"
     assert block.request_line == "GET http://example.com/path HTTP/1.1"
     assert block.headers == "Content-Type: application/json"

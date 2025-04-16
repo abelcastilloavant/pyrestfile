@@ -1,7 +1,7 @@
 from typing import List
-from pyrestfileparser.top_level_grammar import parse_rest_file_text
-from pyrestfileparser.http_request import HTTPRequest, unpack_request_block
-from pyrestfileparser.vars import collect_var_values, Renderer, strip_var_declarations
+from pyrestfile.top_level_grammar import parse_rest_file_text
+from pyrestfile.http_request import HTTPRequest, unpack_request_block
+from pyrestfile.vars import collect_var_values, Renderer, strip_var_declarations
 
 
 def parse_rest_file(text: str, env: dict[str, str] = {}) -> List[HTTPRequest]:

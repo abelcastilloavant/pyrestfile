@@ -2,7 +2,7 @@ import re
 import time
 import uuid
 
-from pyrestfileparser.http_request import HTTPRequest
+from pyrestfile.http_request import HTTPRequest
 
 
 OPTIONAL_WHITESPACE = r"\s*"

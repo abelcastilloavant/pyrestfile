@@ -1,5 +1,5 @@
 import textwrap
-from pyrestfileparser.parser import parse_rest_file
+from pyrestfile.parser import parse_rest_file
 
 
 def _dedent(s: str) -> str:

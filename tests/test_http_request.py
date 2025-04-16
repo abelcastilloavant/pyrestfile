@@ -1,6 +1,6 @@
-import pytest
-from pyrestfileparser.http_request import unpack_request_block, HTTPRequest
-from pyrestfileparser.top_level_grammar import RequestBlock
+from pyrestfile.http_request import unpack_request_block
+from pyrestfile.top_level_grammar import RequestBlock
+
 
 def test_unpack_request_block_full():
     """
@@ -11,7 +11,7 @@ def test_unpack_request_block_full():
         description="My Test Request",
         request_line="GET http://example.com/path HTTP/1.1",
         headers="Content-Type: application/json\nAuthorization: Bearer abc123",
-        body='{"key": "value"}'
+        body='{"key": "value"}',
     )
     req = unpack_request_block(block)
     assert req.description == "My Test Request"
@@ -23,6 +23,7 @@ def test_unpack_request_block_full():
     assert req.headers.get("Authorization") == "Bearer abc123"
     assert req.body == '{"key": "value"}'
 
+
 def test_unpack_request_block_no_headers_no_body():
     """
     Test a block with no headers and no body.
@@ -31,7 +32,7 @@ def test_unpack_request_block_no_headers_no_body():
         description="No Headers or Body",
         request_line="DELETE http://example.com/item/123 HTTP/1.1",
         headers="",
-        body=""
+        body="",
     )
     req = unpack_request_block(block)
     assert req.description == "No Headers or Body"
@@ -44,6 +45,7 @@ def test_unpack_request_block_no_headers_no_body():
     # Body is empty so, in our implementation, it should be an empty string.
     assert req.body == ""
 
+
 def test_unpack_request_block_with_extra_whitespace():
     """
     Test that extra whitespace is removed appropriately from the request line and headers.
@@ -52,7 +54,7 @@ def test_unpack_request_block_with_extra_whitespace():
         description="Whitespace Test",
         request_line="  PUT http://example.com/update HTTP/2.0  ",
         headers="  Content-Type:   text/plain  \n   X-Custom:   value   ",
-        body="  Some body text  \n  with extra spaces  "
+        body="  Some body text  \n  with extra spaces  ",
     )
     req = unpack_request_block(block)
     assert req.description == "Whitespace Test"

@@ -86,7 +86,7 @@ def parse_block(unprocessed_block: str) -> RequestBlock:
             header_lines.append(line.rstrip())
         else:
             break
-    headers = "\n".join(header_lines).strip() if header_lines else None
+    headers = "\n".join(header_lines).strip() if header_lines else ""
 
     first_body_line = next_nonempty(lines, skip_comments=False)
     if first_body_line:
@@ -95,7 +95,7 @@ def parse_block(unprocessed_block: str) -> RequestBlock:
             body_lines.append(line.rstrip())
         body = "\n".join(body_lines).strip()
     else:
-        body = None
+        body = ""
         
     return RequestBlock(
         description=description,
