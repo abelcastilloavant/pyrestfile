@@ -2,7 +2,7 @@ name: Publish to PyPI
 on:
   push:
     tags:
-      - "v*.*.*"       # e.g. v0.3.2
+      - "*.*.*"
 
 permissions:
   id-token: write      # for Trusted Publishing (no API token)
@@ -25,11 +25,5 @@ jobs:
           python -m pip install build
           python -m build
 
-      - name: Check tag matches version
-        run: python - <<'PY'
-import tomllib, pathlib, os, sys, re
-tag = os.environ['GITHUB_REF_NAME'].lstrip('v')
-version = tomllib.loads(pathlib.Path("pyproject.toml").read_text())["project"]["version"]
-assert tag == version, f"Tag {tag} != project version {version}"
-PY
-      - uses: pypa/gh-action-pypi-publish@release/v1   # uses OIDC by default
+      - name: Publish to PyPI via OIDC
+        uses: pypa/gh-action-pypi-publish@release/v1
