@@ -1,6 +1,6 @@
 from typing import List
 from pyrestfile.top_level_grammar import parse_rest_file_text
-from pyrestfile.http_request import HTTPRequest, unpack_request_block
+from pyrestfile.request_block_grammar import HTTPRequest, unpack_request_block
 from pyrestfile.vars import collect_var_values, Renderer, strip_var_declarations
 
 

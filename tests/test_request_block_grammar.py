@@ -1,4 +1,4 @@
-from pyrestfile.http_request import unpack_request_block
+from pyrestfile.request_block_grammar import unpack_request_block
 from pyrestfile.top_level_grammar import RequestBlock
 
 
