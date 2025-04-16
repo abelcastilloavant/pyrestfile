@@ -1,0 +1,35 @@
+name: Publish to PyPI
+on:
+  push:
+    tags:
+      - "v*.*.*"       # e.g. v0.3.2
+
+permissions:
+  id-token: write      # for Trusted Publishing (no API token)
+  contents: read
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    environment: pypi-release   # require manual approval if you like
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: |
+          python -m pip install build
+          python -m build
+
+      - name: Check tag matches version
+        run: python - <<'PY'
+import tomllib, pathlib, os, sys, re
+tag = os.environ['GITHUB_REF_NAME'].lstrip('v')
+version = tomllib.loads(pathlib.Path("pyproject.toml").read_text())["project"]["version"]
+assert tag == version, f"Tag {tag} != project version {version}"
+PY
+      - uses: pypa/gh-action-pypi-publish@release/v1   # uses OIDC by default
