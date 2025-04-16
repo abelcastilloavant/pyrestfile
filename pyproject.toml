@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=65", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
@@ -23,7 +23,7 @@ classifiers = [
   "Natural Language :: English",
 ]
 urls = { "Source" = "https://github.com/abelcastilloavant/pyrestfile" }
-version = "0.0.1"
+dynamic = ["version"] 
 
 
 [[project.authors]]

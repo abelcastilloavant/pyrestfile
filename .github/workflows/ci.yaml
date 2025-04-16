@@ -31,6 +31,13 @@ jobs:
       run: |
         pip install dist/*.whl[dev]
 
+    - name: Show installed package version
+      run: |
+        python - <<'PY'
+        import importlib.metadata as md
+        print("pyrestfile version:", md.version("pyrestfile"))
+        PY
+
     - name: Run pre-commit checks
       uses: pre-commit/action@v3.0.1
 

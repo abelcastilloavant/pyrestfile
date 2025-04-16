@@ -27,6 +27,12 @@ jobs:
         python -m pip install --upgrade pip build
         python -m build  # creates dist/*.whl and dist/*.tar.gz
 
+    - name: Show wheel version (from filename)
+      run: |
+        WHEEL=$(ls dist/*.whl | head -n1)
+        VERSION=$(basename "$WHEEL" | cut -d'-' -f2)
+        echo "Wheel version: $VERSION"
+
     - name: Publish to TestPyPI via OIDC
       uses: pypa/gh-action-pypi-publish@release/v1
       with:

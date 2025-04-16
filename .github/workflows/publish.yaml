@@ -25,5 +25,11 @@ jobs:
           python -m pip install build
           python -m build
 
+      - name: Show wheel version (from filename)
+        run: |
+          WHEEL=$(ls dist/*.whl | head -n1)
+          VERSION=$(basename "$WHEEL" | cut -d'-' -f2)
+          echo "Wheel version: $VERSION"
+
       - name: Publish to PyPI via OIDC
         uses: pypa/gh-action-pypi-publish@release/v1
