@@ -29,7 +29,7 @@ jobs:
 
     - name: Install from built wheel + dev dependencies
       run: |
-        pip install "dist/*.whl[dev]"
+        pip install "$(ls dist/*.whl | head -n1)[dev]"
 
     - name: Show installed package version
       run: |
