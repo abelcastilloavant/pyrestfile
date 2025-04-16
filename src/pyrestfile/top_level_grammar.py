@@ -1,15 +1,16 @@
 """Top-level grammar for parsing REST files.
 
 This module provides functions to parse REST files into structured request blocks,
-including handling delimiters, headers, and bodies. It uses regular expressions to 
+including handling delimiters, headers, and bodies. It uses regular expressions to
 identify and extract relevant parts of the text.
 
-The main function here is `parse_rest_file_text`, which takes a string input and 
+The main function here is `parse_rest_file_text`, which takes a string input and
 returns a list of `RequestBlock` objects for further unpacking.
 """
 
 import re
 from dataclasses import dataclass
+
 
 @dataclass
 class RequestBlock:
@@ -18,8 +19,10 @@ class RequestBlock:
     headers: str
     body: str
 
-DELIMITER_LINE_MATCHER = re.compile(r'^\s*#{3,}.*$')
-DELIMITER_LINE_PATTERN = r'(^\s*#{3,}.*(?:\n|$))'
+
+DELIMITER_LINE_MATCHER = re.compile(r"^\s*#{3,}.*$")
+DELIMITER_LINE_PATTERN = r"(^\s*#{3,}.*(?:\n|$))"
+
 
 def split_along_delimiters(text):
     parts = re.split(DELIMITER_LINE_PATTERN, text, flags=re.MULTILINE)
@@ -29,7 +32,7 @@ def split_along_delimiters(text):
 
     for part in parts:
         if re.match(DELIMITER_LINE_PATTERN, part):
-            pending_delim = part.rstrip('\n')
+            pending_delim = part.rstrip("\n")
         else:
             if part.strip():
                 if pending_delim:
@@ -71,7 +74,7 @@ def parse_block(unprocessed_block: str) -> RequestBlock:
 
     description = None
     if DELIMITER_LINE_MATCHER.match(first_line):
-        m = re.match(r'^\s*#{3,}\s*(.*)$', first_line)
+        m = re.match(r"^\s*#{3,}\s*(.*)$", first_line)
         if m:
             description = m.group(1).strip()
         first_line = next_nonempty(lines, skip_comments=True)
@@ -96,13 +99,8 @@ def parse_block(unprocessed_block: str) -> RequestBlock:
         body = "\n".join(body_lines).strip()
     else:
         body = ""
-        
-    return RequestBlock(
-        description=description,
-        request_line=request_line,
-        headers=headers,
-        body=body
-    )
+
+    return RequestBlock(description=description, request_line=request_line, headers=headers, body=body)
 
 
 def parse_rest_file_text(text: str) -> list[RequestBlock]:

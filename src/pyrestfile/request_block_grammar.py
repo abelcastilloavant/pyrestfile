@@ -1,12 +1,13 @@
 import json
 import re
 from dataclasses import dataclass, field
-from typing import Dict, Optional
+from typing import Dict
 from pyrestfile.top_level_grammar import RequestBlock
 
 
-REQUEST_LINE_REGEX = r'^(?P<method>[a-zA-Z]+)\s+(?P<url>\S+)(?:\s+(?P<version>HTTP/\S+))?'
+REQUEST_LINE_REGEX = r"^(?P<method>[a-zA-Z]+)\s+(?P<url>\S+)(?:\s+(?P<version>HTTP/\S+))?"
 REQUEST_LINE_PATTERN = re.compile(REQUEST_LINE_REGEX)
+
 
 @dataclass
 class ParsedRequestLine:
@@ -16,12 +17,14 @@ class ParsedRequestLine:
     url: str
     http_version: str = ""
 
+
 @dataclass
 class ParsedHeaders:
     """Dataclass representing parsed headers."""
 
     headers: Dict[str, str]
     content_type: str = ""
+
 
 @dataclass
 class HTTPRequest:
@@ -47,20 +50,13 @@ def unpack_request_line(request_line: str) -> ParsedRequestLine:
 
     matched_values = REQUEST_LINE_PATTERN.match(request_line.strip())
     if not matched_values:
-        return ParsedRequestLine(
-            method="GET",
-            url=request_line.strip(),
-            http_version=""
-        )
+        return ParsedRequestLine(method="GET", url=request_line.strip(), http_version="")
     groups = matched_values.groupdict()
     method = groups.get("method", "GET").upper()
     url = groups.get("url", "").strip() if groups.get("url") else ""
     version = groups.get("version", "").strip() if groups.get("version") else ""
-    return ParsedRequestLine(
-        method=method,
-        url=url,
-        http_version=version
-    )
+    return ParsedRequestLine(method=method, url=url, http_version=version)
+
 
 def unpack_headers(headers: str) -> ParsedHeaders:
     """
@@ -69,18 +65,14 @@ def unpack_headers(headers: str) -> ParsedHeaders:
     """
     header_dict = {}
     for line in headers.splitlines():
-        if ':' in line:
+        if ":" in line:
             key, value = line.split(":", 1)
             header_dict[key.strip()] = value.strip()
     if "Content-Type" in header_dict:
         content_type = header_dict.pop("Content-Type", "").strip()
     else:
         content_type = ""
-    return ParsedHeaders(
-        headers=header_dict,
-        content_type=content_type
-    )
-
+    return ParsedHeaders(headers=header_dict, content_type=content_type)
 
 
 def unpack_request_block(block: "RequestBlock") -> HTTPRequest:
@@ -97,7 +89,7 @@ def unpack_request_block(block: "RequestBlock") -> HTTPRequest:
             json.loads(body)
         except json.JSONDecodeError as e:
             raise ValueError(f"Content-Type is {parsed_headers.content_type} but body is invalid JSON: {e}")
-        
+
     return HTTPRequest(
         description=block.description,
         method=parsed_request_line.method,
@@ -105,6 +97,5 @@ def unpack_request_block(block: "RequestBlock") -> HTTPRequest:
         http_version=parsed_request_line.http_version,
         headers=parsed_headers.headers,
         content_type=parsed_headers.content_type,
-        body=body
+        body=body,
     )
-
