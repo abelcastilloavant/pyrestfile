@@ -9,7 +9,6 @@ where = ["src"]
 name = "pyrestfile"
 description = "Parse VS Code-style .rest files into request objects"
 readme = "README.md"
-license = {text = "MIT"}
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
