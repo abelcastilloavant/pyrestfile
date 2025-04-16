@@ -14,7 +14,7 @@ The VS Code REST‑Client extension is fantastic for ad‑hoc API calls, but i
 - ✅  Preserve method, URL, headers, and body exactly as written.
 - ✅  Ignore full‑line comments (`#` or `//`) in the same places VS Code does.
 - ✅  Validate JSON bodies when `Content‑Type: application/json` is set.
-- ✅  Zero runtime dependencies beyond **pyparsing**.
+- ✅  Zero runtime dependencies.
 
 ---
 

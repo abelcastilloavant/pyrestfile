@@ -10,9 +10,6 @@ name = "pyrestfile"
 version = "0.0.1"
 description = "lightweight rest file parser written in python"
 license = "MIT"
-dependencies = [
-    "pyparsing>=3.2"
-]
 
 [[project.authors]]
 name = "Abel Castillo"
