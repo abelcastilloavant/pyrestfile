@@ -49,8 +49,10 @@ def is_comment_line(line: str) -> bool:
     Returns True if the line is a comment.
     A comment line starts with '//' or with '#' but not '###' (i.e. not a delimiter).
     """
-    s = line.strip()
-    return s.startswith("//") or (s.startswith("#") and not s.startswith("###"))
+    stripped_line = line.strip()
+    starts_with_hash = stripped_line.startswith("#") and not stripped_line.startswith("###")
+    starts_with_slash = stripped_line.startswith("//")
+    return starts_with_slash or starts_with_hash
 
 
 def parse_block(unprocessed_block: str) -> RequestBlock:
@@ -60,12 +62,12 @@ def parse_block(unprocessed_block: str) -> RequestBlock:
     lines = iter(unprocessed_block.splitlines())
 
     def next_nonempty(iterator, skip_comments=True):
-        for l in iterator:
-            stop_here = bool(l.strip())
+        for line in iterator:
+            stop_here = bool(line.strip())
             if skip_comments:
-                stop_here = stop_here and not is_comment_line(l)
+                stop_here = stop_here and not is_comment_line(line)
             if stop_here:
-                return l.rstrip()
+                return line.rstrip()
         return None
 
     first_line = next_nonempty(lines, skip_comments=True)
@@ -74,9 +76,9 @@ def parse_block(unprocessed_block: str) -> RequestBlock:
 
     description = None
     if DELIMITER_LINE_MATCHER.match(first_line):
-        m = re.match(r"^\s*#{3,}\s*(.*)$", first_line)
-        if m:
-            description = m.group(1).strip()
+        match_groups = re.match(r"^\s*#{3,}\s*(.*)$", first_line)
+        if match_groups:
+            description = match_groups.group(1).strip()
         first_line = next_nonempty(lines, skip_comments=True)
 
     request_line = first_line
