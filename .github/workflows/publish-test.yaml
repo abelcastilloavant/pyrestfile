@@ -38,5 +38,5 @@ jobs:
     - name: Publish to TestPyPI via OIDC
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
-        repository_url: https://test.pypi.org/legacy/
+        repository-url: https://test.pypi.org/legacy/
         # No api_token supplied → action automatically performs OIDC flow
