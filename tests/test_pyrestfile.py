@@ -6,11 +6,6 @@ import pytest
 
 from pyrestfile import parse_rest_file, HTTPRequest
 
-# ──────────────────────────────────────────────────────────────────────────────
-# Helpers
-# ──────────────────────────────────────────────────────────────────────────────
-
-
 def _dedent(s: str) -> str:
     """Remove leading indentation and margin pipes used in multi‑line strings."""
     return textwrap.dedent(s).replace("│", "").lstrip("\n")
