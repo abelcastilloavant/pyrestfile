@@ -27,7 +27,7 @@ jobs:
     - name: Build distribution
       run: |
         python -m pip install --upgrade pip build
-        python -m build  # creates dist/*.whl and dist/*.tar.gz
+        python -m build
 
     - name: Show wheel version (from filename)
       run: |
