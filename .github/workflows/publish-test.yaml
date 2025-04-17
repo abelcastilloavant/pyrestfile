@@ -1,0 +1,42 @@
+# .github/workflows/publish-testpypi.yml
+name: Publish to TestPyPI (Trusted Publishing)
+
+on:
+  push:
+    branches: [main]   # pick whatever branch should trigger the dev build
+
+permissions:          # OIDC needs this
+  contents: read
+  id-token: write
+
+jobs:
+  publish-testpypi:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out source
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Build distribution
+      run: |
+        python -m pip install --upgrade pip build
+        python -m build  # creates dist/*.whl and dist/*.tar.gz
+
+    - name: Show wheel version (from filename)
+      run: |
+        WHEEL=$(ls dist/*.whl | head -n1)
+        VERSION=$(basename "$WHEEL" | cut -d'-' -f2)
+        echo "Wheel version: $VERSION"
+
+    - name: Publish to TestPyPI via OIDC
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        repository_url: https://test.pypi.org/legacy/
+        # No api_token supplied → action automatically performs OIDC flow

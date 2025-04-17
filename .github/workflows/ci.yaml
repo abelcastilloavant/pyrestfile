@@ -7,22 +7,38 @@ on:
     branches: [main]
 
 jobs:
-  test_and_check:
+  continuous_integration:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: "3.12"
 
-    - name: Install project + dev dependencies
+    - name: Install build tools
       run: |
         python -m pip install --upgrade pip
-        pip install .[dev]
+        pip install build
+
+    - name: Build package
+      run: python -m build
+
+    - name: Install from built wheel + dev dependencies
+      run: |
+        pip install "$(ls dist/*.whl | head -n1)[dev]"
+
+    - name: Show installed package version
+      run: |
+        python - <<'PY'
+        import importlib.metadata as md
+        print("pyrestfile version:", md.version("pyrestfile"))
+        PY
 
     - name: Run pre-commit checks
       uses: pre-commit/action@v3.0.1
